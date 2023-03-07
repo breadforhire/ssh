@@ -13,31 +13,20 @@ import getopt
 import logging
 import json
 import exploits
-#from netdiscover import *
-#
+import main
+
 netifaces.gateways()
 interfaces = netifaces.interfaces()
 addrs = netifaces.ifaddresses(str(interfaces[0]))
-
-#add disclaimer
-
-
+# add
+#exploits.exploits().get_connect()
 class main:
     def __init__(self, multithreading, save_file, log_errs, log_suc, myfile):
         self.multithreading = multithreading
         self.save_file = save_file
         self.log_errs = log_errs
         self.log_suc = log_suc
-        self.myfile = myfile
-
-    def graphics(self):
-     fg.red = Style(RgbFg(255, 0, 0))
-     print(fg.red + "       ____()()")
-     print("      /      @@")
-     print("`~~~~~\_;m__m._>o    jgs")
-     print("interpy")
-     print("This tool is meant for information gathering and nothing more")
-   
+        self.myfile = open("network.txt", "r+")
 
 
 
@@ -54,20 +43,15 @@ class main:
       print(addrs[netifaces.AF_LINK])
 
     def open_two_terminals(self):
-     proc1 = subprocess.Popen(['gnome-terminal', '-x', 'python', 'Exploits.py'])
-     proc2 = subprocess.Popen(['gnome-terminal', '-x', 'python', 'main.py'])
+     proc1 = subprocess.Popen(['gnome-terminal', '-x', 'python', '__init__.py'])
+     proc2 = subprocess.Popen(['gnome-terminal', '-x', 'python', '__init__.py'])
      proc1.wait()
      proc2.wait()
- 
-    def read_brute(self):
-     self.myfile = open(input(str))
-     myline = self.myfile.readline()
-     return myline
+
 
 
     def connect_normal(self):
      outer = connect_listen.connect_listen(hostname=input("hostname: "), username=input("username: "), password=input("password: "), port = 22)
-
      outer.ssh_connect(pkey = None)
      outer.set_connect()
      print(outer.get_connect)
@@ -78,26 +62,21 @@ class main:
     def bruteforce(self):
      print("... bruteforcing into")
 
-     outer_c = main(multithreading = None , save_file = None, log_errs = None, log_suc = None, myfile = "pass.txt")
+     #outer_c = main(multithreading = None , save_file = None, log_errs = None, log_suc = None, myfile = "pass.txt")
 
-     myline = outer_c.read_brute()
+     #myline = outer_c.read_brute()
      hostname = input('hostname')
      username = input('username')
+     my_line = self.myfile.readline()
      while myline:
-        connect_listen.connect_listen(hostname = hostname, username = username, password = self.myfile.readline(), port = 22).ssh_connect(pkey= None)
-
+        connect_listen.connect_listen(hostname = hostname, username = username, password = myfile.readline(), port = 22).ssh_connect(pkey= None)
 
     def testing_preferences(self):
       print("... reading all preferences")
-      print(connect_listen.connect_listen.preference())
       print("... requesting all preferences")
-    
-
-    def jumping_hosts(self):
-     print("... jumping from host to host") #if the connection is not recivered "jump" to next host 
-     file_name = open("jump_host.txt", "r+")
-     for lines in file_name():
-      connect_listen.connect_listen(hostname= "127.0.0.1", username = "ender", password = lines.readline(), port = 22).ssh_connect()
+      my_line = myfile.readline()
+      while my_line:
+         connect_listen.connect_listen(hostname = hostname, username = username, password = password, port = 22).preference(_key = myfile.readline)
 
 
     def connect_auth_no_cred(self):
@@ -110,23 +89,37 @@ class main:
      connect_listen.connect_listen(hostname = input("hostname: "), username = input("username: "), password = input("password: "), port = 22).ssh_connect(pkey = dir_pkey)
 
     def show_connections(self):
-      print("")
+      print("[+] connections")
+      print("[+]") #show hostname, netflow, current state
 
-    def read_network(self):
-     proc = subprocess.run(["bash", "ping.sh"])
-     time.sleep(10)
-     os.system("killall bash")
+
+
+    def _read_network(self):
+     clients = []
+     print("reading network") # add a try and except statement
+     #print(subprocess.check_output(['bash', 'discover.sh']))
+     self.myfile.truncate(0)
+     subprocess.check_output(['bash', 'discover.sh'], shell = True)
+     print("")
+     print("[+]reading network done [+] connecting")
+
+     my_line = self.myfile.readline()
+
+     while my_line:
+      try:
+       print(f'Connecting{self.myfile.readline()}')
+       connect_listen.connect_listen(hostname = my_line, username = input("username: "), password = input("password: "), port = 22).ssh_connect(pkey = None)
+      except:
+        print(f'Connection Failed { self.myfile.readline() }')
+        break
+
+    def _jumphosts(self):
+     print("JUMPING HOST")
+     connect_listen.connect_listen(hostname = "127.0.0.1", username = "root", password = "pass", port = 22).jump_hosts("127.0.0.1", "jump")
 
 
     def read_config(self):
-     print(self.multithreading)
-     print(self.log_suc)
-     print(self.log_errs)
-
-    def read_config_ssh(self):
-     arr = json.loads("")
-     d = {'dict1': {'foo': 1, 'bar': 2}, 'dict2': {'baz': 3, 'quux': 4}}
-     #d_list = []
-     #employee ='{"hostname":"09", "password": "Nitin", "port": 22 , "pkey": ""}
-     ssh_dict = json.loads("arr.:json")
+     print(f'[+] multithreading {self.multithreading}')
+     print(f'[+] logging known hosts {self.log_suc}')
+     print(f'[+] logging all errors {self.log_errs}')
 
