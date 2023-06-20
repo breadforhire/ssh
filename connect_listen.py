@@ -13,7 +13,9 @@ from regex import purge
 import subprocess
 import connect_listen
 import jumpssh
-
+import pyshark
+import logging
+from io import StringIO
 #rewrite all code
 
 client = paramiko.SSHClient()
@@ -22,64 +24,65 @@ client = paramiko.SSHClient()
 ssh_crack = False
 ssh_connect = False
 
-class connect_listen(object):
+class connect_listen:
  def __init__(self, hostname, port, username, password):
-        self = self
         self.hostname = hostname
-        self.port = port
+        self.port = 22
         self.username = username
         self.password = password
 
     
+ def get_hostname(self, hostname): return self.hostname
 
- def get_port(self, port):
-     return self.port
+ def get_port(self, port): return self.port
     
- def get_username(self, username):
-        return self.username
+ def get_username(self, username): return self.username
 
- def set_connect(self):
-     self.connect = True
+ def get_password(self, password): return self.password
 
- def get_hostname(self):
-        return self.hostname
+ def get_client(self) : return client
+
+ def get_keyfile(self):
+  f = open('/path/to/key.pem','r')
+  read = f.read()
+  keyfile = StringIO.StringIO(read)
+  mykey = paramiko.RSAKey.from_private_key(keyfile)
+  return mykey
+
+
+ def logging(self):
+  print(logging.basicConfig())
+  print(logging.getLogger("paramiko").setLevel(logging.WARNING))
+
 
  def socket_in(self):
-      s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-      return s.connect((self.hostname, self.port))
+      _socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+      _socket.connect((self.hostname, self.port))
+      return _socket
 
- def transport(self):
-        #transport = paramiko.transport.Transport(connect_listen().socket_in())
-        _transport = client.get_transport()
-        return _transport
+ def socket_transport(self):
+   transport = paramiko.Transport(self.socket_in())
+   transport.connect()
+   return transport
 
  def channel(self, chanid):
         channel = paramiko.channel.Channel(chanid)
         return channel
 
  def _hexdump(self):
-   self.transport().set_hexdump(True)
+   return self.socket_transport().set_hexdump(True)
 
- def _pack(self):
-  pack = self.transport().packtizer
-  return pack
-
- def _remotekey(self):
-  return self.transport().get_remote_serverkey()
-
- def initate(self):
-       transcport_in = connect_listen().transport().start_client(self.hostname, self.port)
-       return transport_in
+ def remotekey(self):
+  return self.socket_transport().get_remote_serverkey()
 
 
- def ssh_connect(self, pkey):
+ def ssh_connect(self, *passwords, pkey):
         #connect_listen(hostname = self.hostname , port = self.port, username = self.username, password = self.password).initate()
-        client.connect(hostname = self.hostname,port = self.port, username = self.username , password = self.password, key_filename = pkey)
-        client.load_system_host_keys()
-        client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-
-        self.transport()
-        while client.connect:
+        for passin in passwords:
+         client.connect(hostname = self.hostname,port = self.port, username = self.username , password = passin, key_filename = pkey)
+         client.load_system_host_keys()
+         client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+         while client.connect:
           try:
             print("connected run command")
             stdin, stdout, stderr = client.exec_command(input(str))
@@ -89,45 +92,6 @@ class connect_listen(object):
             print("error")
 
             #make more modular
- def inbound(self):
-
-        client.connect(hostname = self.hostname,port = self.port, username = self.username , password = self.password, key_filename = pkey)
-        try:
-          connect_listen().initate()
-          print("Openning Terminal and Transport Channel")
-
-
-          
-          channel = connect_listen().transport().open_session(window_size=None, max_packet_size=None, timeout=None)
-          channel.invoke_shell()
-          
-          print("...host key policy")
-         
-          client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-
-          print("Saving Hostkey(If none then no hostkey will be saved)")
-       
-          client.save_host_keys()
-          client.set_log_channel(name = "logchannel1")
-
-
-          print(connect_listen().transport().open_channel("logchannel1", self.hostname, "127.0.0.1"))
-
-          print(connect_listen().transport().set_hexdump(True))
-
-          print(connect_listen().transport().get_hexdump())
-          
-          security = connect_listen().transport().get_security_options()
-          
-          print("getting info....")
-          
-          print(security.ciphers())
-          print(security.digests())
-          print(security.kex())
-          
-
-        except:
-            print("could not accept")
 
  def _serverkey(self):
      print(f'PUBLIC REMOTE SERVERKEY{self._remotekey()}')
@@ -135,10 +99,22 @@ class connect_listen(object):
      self._remotekey().get_fingerprint()
      self._remotekey().serverkey.get_name()
 
+ def _hexdump(self):
+  print(f'HEXDUMP{self.socket_transport()}')
+  self.socket_transport().set_hexdump(True)
+  print(self.socket_transport().get_hexdump())
+  self.logging()
+
+
  def _log_channel(self):
-  _log = client.set_log_channel(name = "log-channel-1")
+  _log = set.client_log_channel(name = "log-channel-1")
   client.save_host_keys()
   return _log
+
+ def remote_listen(self):
+   capture = pyshark.RemoteCapture(self.hostname, 'wlp3s0')
+   capture.sniff(timeout = 50)
+   print(capture)
 
 
 
@@ -156,28 +132,19 @@ class connect_listen(object):
      cert_der = sslsock.getpeercert(True)
      cert = OpenSSL.crypto.load_certificate(OpenSSL.crypto.FILETYPE_ASN1, cert_der)
      print (cert.get_signature_algorithm() )
-    
-        
- 
- def ssh_pack_data(self, size):
-      packet =  client.get_transport().packetizer
-      print(packet.read_all())
-      read = packet.read_all(15, check_rekey= True)
-      print(read)
 
 
 
  def _agent(self):
-        connect_listen().transport().open_channel(window_size=None, max_packet_size=None, timeout=None)
         print(".... trying to see if forward agent is available")
         try:
-         transport.open_forward_agent_channel() 
+         self.socket_transport().open_forward_agent_channel()
         except:
             print("Agent Foward Channel not available")
     
  def keep_alive(self):
         print("... sending packet to keep this session alive")
-        self.transport().set_keepalive(30)
+        self.socket_transport().set_keepalive(30)
 
 
  def key_ssh(self, privatekeys):
@@ -189,32 +156,27 @@ class connect_listen(object):
         pKey.get_base64()
     
  def invoke_subsytem(self, subsystem):
-        self.channel().invoke_subsystem(subsystem)
+        self.channel(1).invoke_subsystem(subsystem)
 
-    
- def read_data(self, n):
-        self.channel(2).recv_ready()
-        self.channel(2).recv(n)
-        return channel(2).recv(n)
-    
- def get_message(self, content):
-	    message = paramiko.message.Message(content)
-	    message.get_text()
-    
- def starting_handshake(self):
-        start = client.get_transport().packetizer
+ # capture handshake through raw socket
+ def capture_handshake(self):
+        cap = pyshark.LiveCapture(interface = "enp0s25", bpf_filter='port 22')
+        socket = self.socket_in()
+        local = self.socket_transport()
+
+        localpack = self.socket_transport().packetizer
         print("... starting handshake")
+        #self.socket_transport().lock
         try:
-         start.start_handshake(input(str))
+         print(localpack.start_handshake(timeout = 10))
         except:
-            print("an error occured")
+          pass
 
  def auth(self):
         print("... catching bad exception")
         try:
-            paramiko.transport.Transport(self.hostname, self.port).auth_none(self.username) #get sock except
+            self.socket_transport().auth_none(self.username) #get sock except
         except paramiko.BadAuthenticationType:
-            print("This user is not allowed authentication")
             print (paramiko.BadAuthenticationType)
 
  def keygen(self, content_file = "key.txt", bits = None):
@@ -225,24 +187,13 @@ class connect_listen(object):
       pubkey = key.publickey()
       with open("key.txt", 'wb') as content_file:
           content_file.write(pubkey.exportKey('OpenSSH'))
-    
 
- def logging_all_banner(self):
-        print(connect_listen().transport().get_banner())
-        print("... saving the banner to a file")
-        file = open(input(str), "r+")
-        with file:
-         file.write(transport.get_banner())
-
-        
- def preference(self, _key, _compression, _kex, _macs):
+ # person can prefer weak ciphers then decrpyt them using the capture method
+ def preference(self, _pubkeys, _key, _compression, _kex, _macs, _cipher):
         print("requesting preferred config")
-        self.transport().preferred_keys[_key]
-        self.transport().preferred_compression[_compression]
-        self.transport().preferred_kex[_kex]
-        self.transport().preferred_macs[_macs]
-        print(transport().get_security_options())
-
- def send(self, content):
-      _message = self.get_message(content)
-      channel(2).send(_message)
+        secure = paramiko.transport.SecurityOptions(self.socket_transport())
+        secure.ciphers = ((self, _cipher))
+        #secure.kex = ((self, _kex))
+        #secure.compression = ((self, _compression))
+        #secure.key_types = ((self, _key))
+        print(self.socket_transport().get_security_options()._transport)

