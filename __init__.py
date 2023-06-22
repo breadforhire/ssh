@@ -39,9 +39,7 @@ def run():
   print("      '   \itz")
   print(commands_user)
 
-#  session_id = exploit(hostname="107.22.232.39", port = 22, username = "root", password = None).memory_reg()
-  #exploit(hostname="107.22.32.39", port = 22, username = "root", password = None)._pointer_denial()
-  exploit(hostname="107.22.232.39", port = 22, username = "root", password = None).parse_map()
+
   while True:
    input_command = input(str)
 
