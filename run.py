@@ -2,7 +2,7 @@
 import main
 import os 
 import exploits
-import listen
+import connect_listen
 import paramiko
 import logging
 import exploits
@@ -32,6 +32,9 @@ def run():
   print("    ,z/fY-=-")
   print("  - .y ")
   print("      '   \itz")
+
+  #example of a method
+  #main.main("127.0.0.1", 22, "", "").read_network()
 
 
 run()
