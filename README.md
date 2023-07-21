@@ -7,11 +7,13 @@ To install
 
 git clone https://github.com/breadforhire/interpy
 
-sudo python3 __init__.py
+sudo python3 run.py
 
 You can ignore the errors
-__________________________________________________________
+_________________________________________________________
 
-This project is still in the development
+How to use
+
+You can make calls to listen.py, exploits.py, or main.py and run them in the run() function in run.py
 
 
