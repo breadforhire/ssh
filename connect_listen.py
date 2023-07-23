@@ -74,29 +74,28 @@ class connect_listen:
  def remotekey(self):
   return self.socket_transport().get_remote_serverkey()
 
+ def ssh_connect(self, pkey):
 
- def ssh_connect(self, *passwords, pkey):
-        #connect_listen(hostname = self.hostname , port = self.port, username = self.username, password = self.password).initate()
-        for passin in passwords:
-         client.connect(hostname = self.hostname,port = self.port, username = self.username , password = passin, key_filename = pkey)
-         client.load_system_host_keys()
-         client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-         while client.connect:
-          try:
-            print("connected run command")
-            stdin, stdout, stderr = client.exec_command(input(str))
-            print(stdin)
-            return stdin
-          except:
-            print("error")
+   client.connect(hostname = self.hostname,port = self.port, username = self.username , password = self.password, key_filename = pkey)
+   client.load_system_host_keys()
+   client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
-            #make more modular
+    while client.connect:
+     try:
+      print("connected run command")
+      stdin, stdout, stderr = client.exec_command(input(str))
+      print(stdin)
+      return stdin
+     except:
+      print("error")
+
+
 
  def _serverkey(self):
      print(f'PUBLIC REMOTE SERVERKEY{self._remotekey()}')
-     self._remotekey().get_bits()
-     self._remotekey().get_fingerprint()
-     self._remotekey().serverkey.get_name()
+     self.remotekey().get_bits()
+     self.remotekey().get_fingerprint()
+     self.remotekey().serverkey.get_name()
 
  def _hexdump(self):
   print(f'HEXDUMP{self.socket_transport()}')
@@ -116,7 +115,6 @@ class connect_listen:
    print(capture)
 
 
-
  def jump_hosts(self, _jumphost, _jumppass):
   gateway_session = SSHSession(self.hostname,
 
@@ -125,26 +123,14 @@ class connect_listen:
 
                                                       password=_jumppass)
 
-  def get_hash(self):
-     sock = socket.socket()
-     sslsock = ssl.wrap_socket(sock)
-     cert_der = sslsock.getpeercert(True)
-     cert = OpenSSL.crypto.load_certificate(OpenSSL.crypto.FILETYPE_ASN1, cert_der)
-     print (cert.get_signature_algorithm() )
 
-
-
- def _agent(self):
+ def agent(self):
         print(".... trying to see if forward agent is available")
         try:
          self.socket_transport().open_forward_agent_channel()
         except:
             print("Agent Foward Channel not available")
     
- def keep_alive(self):
-        print("... sending packet to keep this session alive")
-        self.socket_transport().set_keepalive(30)
-
 
  def key_ssh(self, privatekeys):
         print("... Loading Key Info....")
@@ -157,9 +143,9 @@ class connect_listen:
  def invoke_subsytem(self, subsystem):
         self.channel(1).invoke_subsystem(subsystem)
 
- # capture handshake through raw socket
- def capture_handshake(self):
-        cap = pyshark.LiveCapture(interface = "enp0s25", bpf_filter='port 22')
+
+ def capture_handshake(self, interface):
+        cap = pyshark.LiveCapture(interface = str(interface), bpf_filter='port 22')
         socket = self.socket_in()
         local = self.socket_transport()
 
@@ -187,12 +173,12 @@ class connect_listen:
       with open("key.txt", 'wb') as content_file:
           content_file.write(pubkey.exportKey('OpenSSH'))
 
- # person can prefer weak ciphers then decrpyt them using the capture method
+
  def preference(self, _pubkeys, _key, _compression, _kex, _macs, _cipher):
         print("requesting preferred config")
         secure = paramiko.transport.SecurityOptions(self.socket_transport())
         secure.ciphers = ((self, _cipher))
-        #secure.kex = ((self, _kex))
-        #secure.compression = ((self, _compression))
-        #secure.key_types = ((self, _key))
+        secure.kex = ((self, _kex))
+        secure.compression = ((self, _compression))
+        secure.key_types = ((self, _key))
         print(self.socket_transport().get_security_options()._transport)
