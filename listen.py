@@ -54,8 +54,6 @@ class connect_listen:
    transport.connect()
    return transport
 
- def remotekey(self):
-  return self.socket_transport().get_remote_serverkey()
 
  def ssh_connect(self, pkey):
          client.connect(hostname = self.hostname,port = self.port, username = self.username , password = self.password, key_filename = pkey)
@@ -70,32 +68,6 @@ class connect_listen:
             return stdin
           except:
             print("error")
-
-
- def _serverkey(self):
-     print(f'PUBLIC REMOTE SERVERKEY{self._remotekey()}')
-     self._remotekey().get_bits()
-     self._remotekey().get_fingerprint()
-     self._remotekey().serverkey.get_name()
-
- def _hexdump(self):
-  print(f'HEXDUMP{self.socket_transport()}')
-  self.socket_transport().set_hexdump(True)
-  print(self.socket_transport().get_hexdump())
-
-
- def remote_listen(self, interface):
-   capture = pyshark.RemoteCapture(self.hostname, inferface)
-   capture.sniff(timeout = 50)
-   print(capture)
-
-
- def key_ssh(self, privatekeys):
-        print("... Loading Key Info....")
-        pKey = paramiko.PKey(message = input(str), data = input(str))
-        pKey.get_name()
-        pKey.get_bits()
-        pKey.get_base64()
 
 
  def keygen(self, content_file = "key.txt", bits = None):
