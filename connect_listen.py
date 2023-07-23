@@ -15,13 +15,8 @@ import jumpssh
 import pyshark
 import logging
 from io import StringIO
-#rewrite all code
 
 client = paramiko.SSHClient()
-
-
-ssh_crack = False
-ssh_connect = False
 
 class connect_listen:
  def __init__(self, hostname, port, username, password):
