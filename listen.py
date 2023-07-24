@@ -1,20 +1,11 @@
 #!/bin/env python
-from fileinput import filename
-from ipaddress import ip_address
-from sys import stdout
-import sys
 import socket
 import paramiko
-from jumpssh import SSHSession
-import ssl, socket, OpenSSL
+import ssl, OpenSSL
 from os import chmod
 from Crypto.PublicKey import RSA
-from regex import purge
-import subprocess
-import jumpssh
-import pyshark
-import logging
 from io import StringIO
+from sys import stdout
 
 client = paramiko.SSHClient()
 
