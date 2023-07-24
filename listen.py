@@ -25,25 +25,6 @@ class connect_listen:
         self.username = username
         self.password = password
 
-    
- def get_hostname(self, hostname): return self.hostname
-
- def get_port(self, port): return self.port
-    
- def get_username(self, username): return self.username
-
- def get_password(self, password): return self.password
-
- def get_client(self) : return client
-
- def get_keyfile(self):
-  f = open('/path/to/key.pem','r')
-  read = f.read()
-  keyfile = StringIO.StringIO(read)
-  mykey = paramiko.RSAKey.from_private_key(keyfile)
-  return mykey
-
-
  def socket_in(self):
    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
    s.connect((self.hostname, self.port))
@@ -53,6 +34,13 @@ class connect_listen:
    transport = paramiko.Transport(self.socket_in())
    transport.connect()
    return transport
+
+ def get_keyfile(self):
+  f = open('/path/to/key.pem','r')
+  read = f.read()
+  keyfile = StringIO.StringIO(read)
+  mykey = paramiko.RSAKey.from_private_key(keyfile)
+  return mykey
 
 
  def ssh_connect(self, pkey):
@@ -70,15 +58,6 @@ class connect_listen:
             print("error")
 
 
- def keygen(self, content_file = "key.txt", bits = None):
-      key = RSA.generate(bits)    
-      with open("key,txt", 'wb') as content_file:
-        chmod("key.txt", 0)
-        content_file.write(key.exportKey('PEM'))
-      pubkey = key.publickey()
-      with open("key.txt", 'wb') as content_file:
-          content_file.write(pubkey.exportKey('OpenSSH'))
-
  def preference(self, _pubkeys, _key, _compression, _kex, _macs, _cipher):
         print("requesting preferred config")
         secure = paramiko.transport.SecurityOptions(self.socket_transport())
@@ -87,3 +66,4 @@ class connect_listen:
         secure.compression = ((self, _compression))
         secure.key_types = ((self, _key))
         print(self.socket_transport().get_security_options()._transport)
+
