@@ -25,7 +25,7 @@ def run():
   print("  - .y ")
   print("      '   \itz")
 
-  #example of a method
+  #example of a method host, port, username, password
   exploits.exploits("127.0.0.1", 22, "", "").info_dump()
 
 
