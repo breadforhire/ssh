@@ -10,10 +10,8 @@ import pyshark
 
 
 
-def check_root_user():
-     if os.geteuid() != 0:
-      exit("You need to have root privileges to run this script.\nPlease try" )
-
+def build():
+ os.system("pip install paramiko & pip install logging & pip install binascii & pip install hashlib & pip install scipy & pip install datetime & pip install scapy & pip install socket & pip install netifaces & pip install subprocess & pip install elementpath & pip install io & pip install sys & pip install crypto")
 
 
 def run():
@@ -32,3 +30,4 @@ def run():
 
 
 run()
+build()
