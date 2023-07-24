@@ -12,7 +12,7 @@ client = paramiko.SSHClient()
 class connect_listen:
  def __init__(self, hostname, port, username, password):
         self.hostname = hostname
-        self.port = 22
+        self.port = port
         self.username = username
         self.password = password
 
