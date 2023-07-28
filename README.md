@@ -5,7 +5,7 @@ _________________________________________________________
 
 To install 
 
-git clone https://github.com/breadforhire/interpy
+git clone https://github.com/breadforhire/phi-ssh
 
 sudo python3 run.py
 
