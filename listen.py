@@ -1,7 +1,5 @@
-#!/bin/env python
 import socket
 import paramiko
-import ssl, OpenSSL
 from os import chmod
 from Crypto.PublicKey import RSA
 from io import StringIO
@@ -27,7 +25,7 @@ class connect_listen:
    return transport
 
  def get_keyfile(self, xdir):
-  f = open(str(xdir),'r')
+  f = open(xdir ,'r')
   read = f.read()
   keyfile = StringIO.StringIO(read)
   mykey = paramiko.RSAKey.from_private_key(keyfile)
@@ -35,7 +33,7 @@ class connect_listen:
 
 
  def ssh_connect(self, pkey):
-         client.connect(hostname = self.hostname,port = self.port, username = self.username , password = self.password, key_filename = self.get_keyfile(input("Enter ssh key directory)))
+         client.connect(hostname = self.hostname,port = self.port, username = self.username , password = self.password, key_filename = self.get_keyfile(input("enter ssh key directory")))
          client.load_system_host_keys()
          client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
@@ -57,4 +55,3 @@ class connect_listen:
         secure.compression = ((self, _compression))
         secure.key_types = ((self, _key))
         print(self.socket_transport().get_security_options()._transport)
-
