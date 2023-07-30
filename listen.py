@@ -1,7 +1,6 @@
 import socket
 import paramiko
 from os import chmod
-from Crypto.PublicKey import RSA
 from io import StringIO
 from sys import stdout
 
